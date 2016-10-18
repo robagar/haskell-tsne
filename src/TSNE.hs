@@ -1,6 +1,6 @@
-module TSNE
-    ( someFunc
+module TSNE ( 
     ) where
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+tsne :: [[Float]] -> IO [[(Float,Float,Float)]]
+tsne _ = undefined
+
