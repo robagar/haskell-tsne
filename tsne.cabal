@@ -15,8 +15,10 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     TSNE
-  build-depends:       base >= 4.7 && < 5
+  exposed-modules:     Data.Algorithm.TSNE
+  build-depends:       base >= 4.7 && < 5,
+                       mtl,
+                       normaldistribution
   default-language:    Haskell2010
 
 test-suite tSNE-test
