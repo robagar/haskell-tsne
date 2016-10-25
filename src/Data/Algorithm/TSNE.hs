@@ -32,7 +32,9 @@ instance Default TSNEOptions where
 
 data TSNEState = TSNEState {
     stIteration :: Int,
-    stSolution :: [[Float]]
+    stSolution :: [[Float]],
+    stGains :: [[Float]],
+    stMomentums :: [[Float]]
 }
 
 tsne :: TSNEOptions -> TSNEInput -> IO [TSNEOutput3D]
@@ -43,21 +45,9 @@ tsne opts vs = do
 initState :: Int -> IO TSNEState
 initState n = do
     s <- initSolution3D n
-    return $ TSNEState 0 s
-
-runTSNE :: TSNEOptions -> TSNEInput -> (StateT TSNEState (Writer [TSNEOutput3D])) ()
-runTSNE opts vs = forever $ do
-    st <- get
-    let st' = stepTSNE opts vs st
-    when (shouldOutput st st') $ do 
-        tell $ [output3D st']
-    put st'
-
-stepTSNE :: TSNEOptions -> TSNEInput -> TSNEState -> TSNEState
-stepTSNE opts vs st = TSNEState i s
-    where
-        i = stIteration st + 1
-        s = undefined
+    return $ TSNEState 0 s (f 1) (f 0)
+        where
+            f m = take 3 $ repeat $ take n $ repeat m 
 
 initSolution3D :: Int -> IO [[Float]]
 initSolution3D n = do
@@ -67,11 +57,24 @@ initSolution3D n = do
     zs <- ns
     return $ map (take n) [xs,ys,zs]
 
+runTSNE :: TSNEOptions -> TSNEInput -> (StateT TSNEState (Writer [TSNEOutput3D])) ()
+runTSNE opts vs = forever $ do
+    st <- get
+    let st' = stepTSNE opts vs st
+    tell $ [output3D st']
+    put st'
+
+stepTSNE :: TSNEOptions -> TSNEInput -> TSNEState -> TSNEState
+stepTSNE opts vs st = TSNEState i s g m
+    where
+        i = stIteration st + 1
+        (s,g,m) = undefined
+
+applySolutionDeltas :: [[Float]] -> [[Float]] -> [[Float]]
+applySolutionDeltas s d = zipWithM (+) s d
+
 solution3D :: [[Float]] -> [Position3D]
 solution3D (xs:ys:zs:_) = zip3 xs ys zs
-
-shouldOutput :: TSNEState -> TSNEState -> Bool
-shouldOutput _ _ = True -- TODO
 
 output3D :: TSNEState -> TSNEOutput3D
 output3D st = TSNEOutput3D i s c
