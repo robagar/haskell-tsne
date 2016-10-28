@@ -7,7 +7,7 @@ module Data.Algorithm.TSNE (
 import Control.Monad.Writer.Lazy
 import Control.Monad.State.Lazy
 import Data.Default
-import Data.List(foldl')
+import Data.List(foldr)
 import Data.Random.Normal (normalsIO')
 import Debug.Trace
 
@@ -70,8 +70,9 @@ stepTSNE opts vs st = TSNEState i s g m
         i = stIteration st + 1
         (s,g,m) = undefined
 
+
 applySolutionDeltas :: [[Float]] -> [[Float]] -> [[Float]]
-applySolutionDeltas s d = zipWithM (+) s d
+applySolutionDeltas = zipWith (zipWith (+))
 
 solution3D :: [[Float]] -> [Position3D]
 solution3D (xs:ys:zs:_) = zip3 xs ys zs
@@ -89,15 +90,95 @@ cost st = undefined
 infinity :: Float
 infinity = read "Infinity"
  
-targetEntropy :: Float -> Float
-targetEntropy = log
+targetEntropy :: TSNEOptions -> Float
+targetEntropy = log.realToFrac.tsnePerplexity
 
 distanceSquared :: [Float] -> [Float] -> Float
-distanceSquared as bs = foldl' d 0 (zip as bs)
-    where d t (a,b) = t + (a-b) * (a-b)
+distanceSquared as bs = foldr d 0 (zip as bs)
+    where d (a,b) t  = t + (a-b) * (a-b)
 
-neighbourProbability :: (Int, [TSNEInputValue]) -> (Int, [TSNEInputValue]) -> Float
-neighbourProbability (i,a) (j,b) 
-    | i == j    = 0
-    | otherwise = undefined
+--neighbourProbability :: TSNEInputValue -> TSNEInputValue -> Float
+--neighbourProbability a b 
+--    | a == b    = 0
+--    | otherwise = undefined
 
+data Beta = Beta {
+    betaValue :: Float,
+    betaMin :: Float,
+    betaMax :: Float
+}
+
+neighbourProbabilities :: TSNEOptions -> TSNEInput -> [[Float]]
+neighbourProbabilities opts vs = symmetrize $ rawNeighbourProbabilities opts vs
+
+symmetrize :: [[Float]] -> [[Float]]
+symmetrize _ = undefined
+
+rawNeighbourProbabilities :: TSNEOptions -> TSNEInput -> [[Float]]
+rawNeighbourProbabilities opts vs = map np vs
+    where 
+        np a = aps (beta a) vs a
+        beta a = betaValue $ binarySearchBeta opts vs a
+
+        aps :: Float -> TSNEInput -> TSNEInputValue -> [Float]
+        aps beta bs a = map pj' bs
+            where
+                psum = sum $ map pj bs
+                pj b 
+                    | a == b    = 0
+                    | otherwise = exp $ -(distanceSquared a b) * beta 
+                pj' b = pj b / psum
+
+binarySearchBeta :: TSNEOptions -> TSNEInput -> TSNEInputValue -> Beta
+binarySearchBeta opts vs = binarySearchBeta' opts vs 1e-4 0 (Beta 1 (-infinity) infinity)
+
+binarySearchBeta' :: TSNEOptions -> TSNEInput -> Float -> Int -> Beta -> TSNEInputValue -> Beta
+binarySearchBeta' opts bs tol i beta a
+    | i == 50            = beta
+    | abs (e - t) < tol  = beta
+    | e > t              = r $ incPrecision beta
+    | otherwise          = r $ decPrecision beta 
+        where
+            t = targetEntropy opts
+            e = entropyForInputValue (betaValue beta) bs a
+            incPrecision (Beta b _ bmax) 
+                | bmax == infinity = Beta (b * 2) b bmax
+                | otherwise        = Beta ((b + bmax) / 2) b bmax
+            decPrecision (Beta b bmin _) 
+                | bmin == -infinity = Beta (b / 2) bmin b
+                | otherwise         = Beta ((b + bmin) / 2) bmin b
+            r beta' = binarySearchBeta' opts bs tol (i+1) beta' a 
+
+entropyForInputValue :: Float -> TSNEInput -> TSNEInputValue -> Float
+entropyForInputValue beta bs a = sum $ map h bs
+    where
+        h b = if x > 1e-7 then -x * log x else 0
+            where x = pj' b
+        psum = sum $ map pj bs
+        pj b 
+            | a == b    = 0
+            | otherwise = exp $ -(distanceSquared a b) * beta 
+        pj' b = pj b / psum
+
+
+
+
+
+--neighbourProbability :: (Int, TSNEInputValue) -> (Int, TSNEInputValue) -> Float
+--neighbourProbability (i,a) (j,b) 
+--    | i == j    = 0
+--    | otherwise = undefined
+
+--entropy :: Float -> (Int, TSNEInputValue) -> [(Int, TSNEInputValue)] -> Float
+--entropy beta (i,a) ibs = undefined
+--    where
+--        dh (j,b) = if pjb > 1e-7 then -pjb * log pjb else 0
+--            where pjb = pj (j,b)  
+--        psum = sum $ map pj ibs
+--        pj (j,b) 
+--            | i == j    = 0
+--            | otherwise = exp $ -(distanceSquared a b) * beta 
+--        pj' (j,b) = pj (j,b) / psum
+
+--indexedInput :: TSNEInput -> [(Int, TSNEInputValue)]
+--indexedInput = zip [0..]  
