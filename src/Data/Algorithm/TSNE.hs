@@ -7,7 +7,7 @@ module Data.Algorithm.TSNE (
 import Control.Monad.Writer.Lazy
 import Control.Monad.State.Lazy
 import Data.Default
-import Data.List(foldr)
+import Data.List(foldr, transpose)
 import Data.Random.Normal (normalsIO')
 import Debug.Trace
 
@@ -30,11 +30,15 @@ data TSNEOutput3D = TSNEOutput3D {
 instance Default TSNEOptions where
     def = TSNEOptions 30 10
 
+type Gain = Float
+type Delta = Float
+type Gradient = Float
+
 data TSNEState = TSNEState {
     stIteration :: Int,
     stSolution :: [[Float]],
-    stGains :: [[Float]],
-    stMomentums :: [[Float]]
+    stGains :: [[Gain]],
+    stDeltas :: [[Delta]]
 }
 
 tsne :: TSNEOptions -> TSNEInput -> IO [TSNEOutput3D]
@@ -45,9 +49,10 @@ tsne opts vs = do
 initState :: Int -> IO TSNEState
 initState n = do
     s <- initSolution3D n
-    return $ TSNEState 0 s (f 1) (f 0)
+    return $ TSNEState 0 s (rr 1) (rr 0)
         where
-            f m = take 3 $ repeat $ take n $ repeat m 
+            rr = repeat.repeat
+            --f m = take 3 $ repeat $ take n $ repeat m 
 
 initSolution3D :: Int -> IO [[Float]]
 initSolution3D n = do
@@ -65,14 +70,34 @@ runTSNE opts vs = forever $ do
     put st'
 
 stepTSNE :: TSNEOptions -> TSNEInput -> TSNEState -> TSNEState
-stepTSNE opts vs st = TSNEState i s g m
+stepTSNE opts vs st = TSNEState i' s' g' d'
     where
-        i = stIteration st + 1
-        (s,g,m) = undefined
+        i = stIteration st
+        s = stSolution st
+        g = stGains st
+        d = stDeltas st
+        gr = gradients st
+        i' = i + 1
+        s' = recenter $ z (+) s d'
+        g' = z3 newGain g d gr
+        d' = z3 (newDelta (tsneLearningRate opts) i) g' d gr
+        z = zipWith.zipWith
+        z3 = zipWith3.zipWith3
 
+newGain :: Gain -> Delta -> Gradient -> Gain
+newGain g d gr = max 0.01 g'
+    where
+        g' = if signum d == signum gr 
+                then g * 0.8
+                else g + 0.2  
 
-applySolutionDeltas :: [[Float]] -> [[Float]] -> [[Float]]
-applySolutionDeltas = zipWith (zipWith (+))
+newDelta :: Float -> Int -> Gain -> Delta -> Gradient -> Delta
+newDelta e i g' d gr = (m * d) - (e * g' * gr)
+    where
+        m = if i < 250 then 0.5 else 0.8
+
+gradients :: TSNEState -> [[Gradient]]
+gradients st = undefined 
 
 solution3D :: [[Float]] -> [Position3D]
 solution3D (xs:ys:zs:_) = zip3 xs ys zs
@@ -97,11 +122,6 @@ distanceSquared :: [Float] -> [Float] -> Float
 distanceSquared as bs = foldr d 0 (zip as bs)
     where d (a,b) t  = t + (a-b) * (a-b)
 
---neighbourProbability :: TSNEInputValue -> TSNEInputValue -> Float
---neighbourProbability a b 
---    | a == b    = 0
---    | otherwise = undefined
-
 data Beta = Beta {
     betaValue :: Float,
     betaMin :: Float,
@@ -112,7 +132,11 @@ neighbourProbabilities :: TSNEOptions -> TSNEInput -> [[Float]]
 neighbourProbabilities opts vs = symmetrize $ rawNeighbourProbabilities opts vs
 
 symmetrize :: [[Float]] -> [[Float]]
-symmetrize _ = undefined
+symmetrize m = (zipWith.zipWith) f m (transpose m)
+    where 
+        f :: Float -> Float -> Float
+        f x y = max a 1e-100
+            where a = (x + y) / (2 * (realToFrac.length) m) 
 
 rawNeighbourProbabilities :: TSNEOptions -> TSNEInput -> [[Float]]
 rawNeighbourProbabilities opts vs = map np vs
@@ -160,7 +184,12 @@ entropyForInputValue beta bs a = sum $ map h bs
             | otherwise = exp $ -(distanceSquared a b) * beta 
         pj' b = pj b / psum
 
-
+recenter :: [[Float]] -> [[Float]]
+recenter vs = map r vs
+    where 
+        r v = map (subtract (mean v)) v
+        mean v = sum v / (realToFrac.length) v
+         
 
 
 
