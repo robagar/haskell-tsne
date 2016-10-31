@@ -7,7 +7,7 @@ module Data.Algorithm.TSNE (
 import Control.Monad.Writer.Lazy
 import Control.Monad.State.Lazy
 import Data.Default
-import Data.List(foldr, transpose)
+import Data.List(foldr, transpose, zipWith4)
 import Data.Random.Normal (normalsIO')
 import Debug.Trace
 
@@ -33,6 +33,7 @@ instance Default TSNEOptions where
 type Gain = Float
 type Delta = Float
 type Gradient = Float
+type Entropy = Float
 
 data TSNEState = TSNEState {
     stIteration :: Int,
@@ -44,7 +45,8 @@ data TSNEState = TSNEState {
 tsne :: TSNEOptions -> TSNEInput -> IO [TSNEOutput3D]
 tsne opts vs = do
     st <- initState $ length vs
-    return $ [output3D st] ++ (execWriter $ evalStateT (runTSNE opts vs) st)
+    let ps = neighbourProbabilities opts vs
+    return $ [output3D ps st] ++ (execWriter $ evalStateT (runTSNE opts vs ps) st)
 
 initState :: Int -> IO TSNEState
 initState n = do
@@ -62,21 +64,21 @@ initSolution3D n = do
     zs <- ns
     return $ map (take n) [xs,ys,zs]
 
-runTSNE :: TSNEOptions -> TSNEInput -> (StateT TSNEState (Writer [TSNEOutput3D])) ()
-runTSNE opts vs = forever $ do
+runTSNE :: TSNEOptions -> TSNEInput -> [[Float]] -> (StateT TSNEState (Writer [TSNEOutput3D])) ()
+runTSNE opts vs ps = forever $ do
     st <- get
-    let st' = stepTSNE opts vs st
-    tell $ [output3D st']
+    let st' = stepTSNE opts vs ps st
+    tell $ [output3D ps st']
     put st'
 
-stepTSNE :: TSNEOptions -> TSNEInput -> TSNEState -> TSNEState
-stepTSNE opts vs st = TSNEState i' s' g' d'
+stepTSNE :: TSNEOptions -> TSNEInput -> [[Float]] -> TSNEState -> TSNEState
+stepTSNE opts vs ps st = TSNEState i' s' g' d'
     where
         i = stIteration st
         s = stSolution st
         g = stGains st
         d = stDeltas st
-        gr = gradients st
+        gr = gradients ps st
         i' = i + 1
         s' = recenter $ z (+) s d'
         g' = z3 newGain g d gr
@@ -96,26 +98,42 @@ newDelta e i g' d gr = (m * d) - (e * g' * gr)
     where
         m = if i < 250 then 0.5 else 0.8
 
-gradients :: TSNEState -> [[Gradient]]
-gradients st = undefined 
+gradients :: [[Float]] -> TSNEState -> [[Gradient]]
+gradients pss st = zipWith4 (gradient i ss) ss pss qss qss'
+    where
+        ss = stSolution st
+        i = stIteration st
+        qss = qdist ss
+        qss' = qdist' ss 
+        gradient :: Int -> [[Float]] -> [Float] -> [Float] -> [Float] -> [Float] -> [Gradient]
+        gradient i ss s ps qs qs' = (map sum . transpose) $ zipWith4 g ps qs qs' ss
+            where
+                g :: Float -> Float -> Float -> [Float] -> [Gradient]
+                g p q q' t = zipWith (\x y -> m * (x - y)) s t
+                    where
+                        m = 4 * (k * p - q') * q
+                        k = if i < 100 then 4 else 1
+
 
 solution3D :: [[Float]] -> [Position3D]
 solution3D (xs:ys:zs:_) = zip3 xs ys zs
 
-output3D :: TSNEState -> TSNEOutput3D
-output3D st = TSNEOutput3D i s c
+output3D :: [[Float]] -> TSNEState -> TSNEOutput3D
+output3D pss st = TSNEOutput3D i s c
     where
         i = stIteration st
         s = (solution3D . stSolution) st
-        c = cost st
+        c = cost pss st
 
-cost :: TSNEState -> Float
-cost st = undefined
+cost :: [[Float]] -> TSNEState -> Float
+cost pss st = sumsum $ (zipWith.zipWith) c pss (qdist' (stSolution st))
+    where
+        c p q = -p * log q 
 
 infinity :: Float
 infinity = read "Infinity"
  
-targetEntropy :: TSNEOptions -> Float
+targetEntropy :: TSNEOptions -> Entropy
 targetEntropy = log.realToFrac.tsnePerplexity
 
 distanceSquared :: [Float] -> [Float] -> Float
@@ -173,7 +191,7 @@ binarySearchBeta' opts bs tol i beta a
                 | otherwise         = Beta ((b + bmin) / 2) bmin b
             r beta' = binarySearchBeta' opts bs tol (i+1) beta' a 
 
-entropyForInputValue :: Float -> TSNEInput -> TSNEInputValue -> Float
+entropyForInputValue :: Float -> TSNEInput -> TSNEInputValue -> Entropy
 entropyForInputValue beta bs a = sum $ map h bs
     where
         h b = if x > 1e-7 then -x * log x else 0
@@ -185,13 +203,29 @@ entropyForInputValue beta bs a = sum $ map h bs
         pj' b = pj b / psum
 
 recenter :: [[Float]] -> [[Float]]
-recenter vs = map r vs
+recenter vs = transpose $ map r (transpose vs)
     where 
         r v = map (subtract (mean v)) v
         mean v = sum v / (realToFrac.length) v
          
+qdist :: [[Float]] -> [[Float]]
+qdist vs = [[q a b | a <- vs] | b <- vs]
+    where 
+        q :: [Float] -> [Float] -> Float
+        q a b = 1 / (1 + s)
+            where
+                s = sum $ zipWith f a b
+                f a b = (a-b) * (a-b) 
 
-
+qdist' :: [[Float]] -> [[Float]]
+qdist' vs = (map.map) f qd
+    where
+        qd = qdist vs
+        f :: Float -> Float 
+        f q = max (q / sumsum qd) 1e-100
+ 
+sumsum :: [[Float]] -> Float
+sumsum m = sum $ map sum m 
 
 --neighbourProbability :: (Int, TSNEInputValue) -> (Int, TSNEInputValue) -> Float
 --neighbourProbability (i,a) (j,b) 
