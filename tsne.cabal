@@ -15,7 +15,10 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Data.Algorithm.TSNE
+  exposed-modules:     Data.Algorithm.TSNE,
+                       Data.Algorithm.TSNE.Types, 
+                       Data.Algorithm.TSNE.Internals, 
+                       Data.Algorithm.TSNE.Utils 
   build-depends:       base >= 4.7 && < 5,
                        mtl,
                        data-default,
