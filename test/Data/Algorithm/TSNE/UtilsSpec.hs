@@ -10,16 +10,25 @@ main = hspec spec
 
 spec :: Spec
 spec = do
-  describe "infinity" $ do
-    it "greater than 1e99" $ do
-      infinity `shouldSatisfy` (> 1e99)
+    describe "infinity" $ do
+        it "greater than 1e99" $ do
+            infinity `shouldSatisfy` (> 1e99)
 
-  describe "symmetricalMatrixFromTopRight" $ do
-    it "passed nothing returns nothing" $ do
-        symmetricalMatrixFromTopRight [] `shouldBe` ([] :: [[Double]])
-    it "passed one value returns one value" $ do
-        symmetricalMatrixFromTopRight [[42]] `shouldBe` ([[42]] :: [[Double]])
-    it "passed 2x2 top right" $ do
-        symmetricalMatrixFromTopRight [["a1", "a2"], ["b2"]] `shouldBe` [["a1", "a2"], ["a2", "b2"]] 
-    it "passed 3x3 top right" $ do
-        symmetricalMatrixFromTopRight [["a1", "a2", "a3"], ["b2", "b3"], ["c3"]] `shouldBe` [["a1", "a2", "a3"], ["a2", "b2", "b3"], ["a3", "b3", "c3"]] 
+    describe "symmetricalMatrixFromTopRight" $ do
+        it "passed nothing returns nothing" $ do
+            symmetricalMatrixFromTopRight [] `shouldBe` ([] :: [[Double]])
+        it "passed one value returns one value" $ do
+            symmetricalMatrixFromTopRight [[42]] `shouldBe` ([[42]] :: [[Double]])
+        it "passed 2x2 top right" $ do
+            symmetricalMatrixFromTopRight [["a1", "a2"], ["b2"]] `shouldBe` [["a1", "a2"], ["a2", "b2"]] 
+        it "passed 3x3 top right" $ do
+            symmetricalMatrixFromTopRight [["a1", "a2", "a3"], ["b2", "b3"], ["c3"]] `shouldBe` [["a1", "a2", "a3"], ["a2", "b2", "b3"], ["a3", "b3", "c3"]] 
+
+    describe "qdist" $ do
+        it "passed nothing return nothing" $ do
+            pending
+            --qdist [] `shouldBe` ([] :: [[Double]])
+
+    describe "tr" $ do
+        it "passed nothing return nothing" $ do
+            tr [] `shouldBe` ([] :: [[Double]])

@@ -25,7 +25,7 @@ recenter ss = map r ss
 qdist :: [[Double]] -> [[Double]]
 qdist ss = symmetricalMatrixFromTopRight tr
     where
-        tr = qs <$> (zipWith drop [0..] (repeat ss))
+        tr = qs <$> take (length ss) (zipWith drop [0..] (repeat ss))
         qs :: [[Double]] -> [Double] 
         qs ts = zipWith q ss ts
         q :: [Double] -> [Double] -> Double
