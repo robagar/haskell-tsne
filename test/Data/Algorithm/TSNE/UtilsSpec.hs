@@ -8,6 +8,8 @@ import Data.Algorithm.TSNE.Utils
 main :: IO ()
 main = hspec spec
 
+u = undefined
+
 spec :: Spec
 spec = do
     describe "infinity" $ do
@@ -29,6 +31,3 @@ spec = do
             pending
             --qdist [] `shouldBe` ([] :: [[Double]])
 
-    describe "tr" $ do
-        it "passed nothing return nothing" $ do
-            tr [] `shouldBe` ([] :: [[Double]])

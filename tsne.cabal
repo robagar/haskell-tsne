@@ -18,7 +18,8 @@ library
   exposed-modules:     Data.Algorithm.TSNE,
                        Data.Algorithm.TSNE.Types, 
                        Data.Algorithm.TSNE.Internals, 
-                       Data.Algorithm.TSNE.Utils 
+                       Data.Algorithm.TSNE.Utils,
+                       Data.Algorithm.TSNE.Checks 
   build-depends:       base >= 4.7 && < 5,
                        mtl,
                        data-default,
@@ -30,7 +31,9 @@ test-suite tSNE-test
    hs-source-dirs:      test
    main-is:             Spec.hs
    other-modules:       Data.Algorithm.TSNESpec,
-                        Data.Algorithm.TSNE.UtilsSpec
+                        Data.Algorithm.TSNE.InternalsSpec,
+                        Data.Algorithm.TSNE.UtilsSpec,
+                        Data.Algorithm.TSNE.ChecksSpec
    build-depends:       base,
                         hspec,
                         data-default,

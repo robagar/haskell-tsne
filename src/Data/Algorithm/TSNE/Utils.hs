@@ -54,3 +54,5 @@ symmetricalMatrixFromTopRight tr = zipWith (++) bl tr
         m = zipWith (++) ebl tr
         ebl = zipWith take [0..] (reprep undefined)
 
+
+
