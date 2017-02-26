@@ -37,3 +37,19 @@ spec = do
             isSquare 1 [[u,u]] `shouldBe` False
         it "1x2 is not 2x2" $ do
             isSquare 2 [[u,u]] `shouldBe` False
+
+    describe "has2DShape" $ do
+        it "empty is 0x0" $ do
+            has2DShape (0,0) [] `shouldBe` True
+        --it "empty is not 1x0" $ do
+        --    has2DShape (1,0) [] `shouldBe` False
+        it "empty is not 0x1" $ do
+            has2DShape (0,1) [] `shouldBe` False
+        it "1x2 is 1x2" $ do
+            has2DShape (1,2) [[u],[u]] `shouldBe` True
+        it "2x1 is 2x1" $ do
+            has2DShape (2,1) [[u,u]] `shouldBe` True
+        it "1x2 is not 2x1" $ do
+            has2DShape (2,1) [[u],[u]] `shouldBe` False
+        it "2x1 is not 1x2" $ do
+            has2DShape (1,2) [[u,u]] `shouldBe` False

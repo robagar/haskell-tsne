@@ -22,17 +22,32 @@ recenter ss = map r ss
         r s = subtract (mean s) <$> s
         mean s = sum s / (realToFrac.length) s
          
+--qdist :: [[Double]] -> [[Double]]
+--qdist ss = symmetricalMatrixFromTopRight tr
+--    where
+--        tr = qs <$> take (length (head ss)) (zipWith drop [0..] (repeat ss))
+--        qs :: [[Double]] -> [Double] 
+--        qs ts = zipWith q ss ts
+--        q :: [Double] -> [Double] -> Double
+--        q a b = 1 / (1 + s)
+--            where
+--                s = sum $ zipWith f a b
+--                f a b = (a-b) * (a-b) 
+
 qdist :: [[Double]] -> [[Double]]
-qdist ss = symmetricalMatrixFromTopRight tr
+qdist ss = symmetricalMatrixFromTopRight $ qd (transpose ss)
     where
-        tr = qs <$> take (length ss) (zipWith drop [0..] (repeat ss))
-        qs :: [[Double]] -> [Double] 
-        qs ts = zipWith q ss ts
-        q :: [Double] -> [Double] -> Double
-        q a b = 1 / (1 + s)
+        qd [] = []
+        qd ps = [qr ps] ++ qd (tail ps)
+        qr :: [[Double]] -> [Double]
+        qr ps =  [0::Double] ++ (q (head ps) <$> tail ps)
+        q as bs = 1 / (1 + s)
             where
-                s = sum $ zipWith f a b
+                s = sum $ zipWith f as bs
                 f a b = (a-b) * (a-b) 
+        
+
+
 
 qdist' :: [[Double]] -> [[Double]]
 qdist' ss = (map.map) f qd

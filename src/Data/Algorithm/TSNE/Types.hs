@@ -22,6 +22,7 @@ data TSNEOutput3D = TSNEOutput3D {
 instance Default TSNEOptions where
     def = TSNEOptions 30 10
 
+type Probability = Double
 type Gain = Double
 type Delta = Double
 type Gradient = Double
@@ -32,4 +33,4 @@ data TSNEState = TSNEState {
     stSolution :: [[Double]],
     stGains :: [[Gain]],
     stDeltas :: [[Delta]]
-}
+} deriving (Show)

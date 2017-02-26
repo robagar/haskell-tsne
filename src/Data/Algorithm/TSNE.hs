@@ -16,6 +16,6 @@ tsne :: TSNEOptions -> TSNEInput -> IO [TSNEOutput3D]
 tsne opts vs = do
     st <- initState $ length vs
     let ps = neighbourProbabilities opts vs
-    return $ [output3D ps st] -- ++ (execWriter $ evalStateT (runTSNE opts vs ps) st)
+    return $ [output3D ps st] ++ (execWriter $ evalStateT (runTSNE opts vs ps) st)
 
 
