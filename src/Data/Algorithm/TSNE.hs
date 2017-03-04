@@ -11,7 +11,9 @@ import Data.Algorithm.TSNE.Types
 import Data.Algorithm.TSNE.Internals
 import Data.Algorithm.TSNE.Utils
 
+{- |
 
+-}
 tsne3D :: TSNEOptions -> TSNEInput -> IO [TSNEOutput3D]
 tsne3D opts vs = do
     st <- initState $ length vs

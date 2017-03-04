@@ -41,7 +41,6 @@ initState n = do
     return $ TSNEState 0 s (rr 1) (rr 0)
         where
             rr = repeat.repeat
-            --f m = take 3 $ repeat $ take n $ repeat m 
 
 initSolution3D :: Int -> IO [[Double]]
 initSolution3D n = do
@@ -102,24 +101,6 @@ gradients pss st = gradient <$> ss
                     where
                         m = 4 * (k * p - q') * q
                         k = if i < 100 then 4 else 1
-
-
-
---gradients pss st = zipWith4 (gradient i ss) ss pss qss qss'
---    where
---        ss = stSolution st
---        i = stIteration st
---        qss = qdist ss
---        qss' = qdist' ss 
---        gradient :: Int -> [[Double]] -> [Double] -> [Double] -> [Double] -> [Double] -> [Gradient]
---        gradient i ss s ps qs qs' = (map sum) $ zipWith4 g ps qs qs' ss
---            where
---                g :: Double -> Double -> Double -> [Double] -> [Gradient]
---                g p q q' t = zipWith (\x y -> m * (x - y)) s t
---                    where
---                        m = 4 * (k * p - q') * q
---                        k = if i < 100 then 4 else 1
-
 
 solution3D :: [[Double]] -> [Position3D]
 solution3D (xs:ys:zs:_) = zip3 xs ys zs

@@ -1,3 +1,4 @@
 syntax: glob
 
 .stack-work
+example/scikit_learn_digits_data.txt
