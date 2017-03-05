@@ -21,9 +21,10 @@ library
                        Data.Algorithm.TSNE.Utils,
                        Data.Algorithm.TSNE.Checks 
   build-depends:       base >= 4.7 && < 5,
-                       mtl,
                        data-default,
-                       normaldistribution
+                       deepseq,
+                       normaldistribution,
+                       pipes
   default-language:    Haskell2010
   ghc-options:         -O2
 
@@ -50,6 +51,7 @@ executable haskell_tsne_example
    main-is:            Main.hs
    build-depends:      base,
                        data-default,
+                       pipes,
                        tsne
    ghc-options:        -O2
                        -threaded

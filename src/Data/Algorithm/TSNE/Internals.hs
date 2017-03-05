@@ -1,12 +1,12 @@
 module Data.Algorithm.TSNE.Internals where
 
 import Control.Applicative
-import Control.Monad.Writer.Lazy
-import Control.Monad.State.Lazy
+import Control.DeepSeq
 import Control.Exception (assert)
 import Data.Default (def)
 import Data.List(zipWith4)
 import Data.Random.Normal (normalsIO')
+import Pipes
 --import Debug.Trace
 
 import Data.Algorithm.TSNE.Types
@@ -50,12 +50,11 @@ initSolution3D n = do
     zs <- ns
     return $ take n <$> [xs,ys,zs]
 
-runTSNE :: TSNEOptions -> TSNEInput -> [[Probability]] -> (StateT TSNEState (Writer [TSNEOutput3D])) ()
-runTSNE opts vs ps = forever $ do
-    st <- get
-    let st' = stepTSNE opts vs ps st
-    tell $ [output3D ps st']
-    put st'
+runTSNE :: TSNEOptions -> TSNEInput -> [[Probability]] -> TSNEState -> Producer TSNEOutput3D IO ()
+runTSNE opts vs ps st = do
+    let st' = force $ stepTSNE opts vs ps st
+    yield $ output3D ps st'
+    runTSNE opts vs ps st'
 
 stepTSNE :: TSNEOptions -> TSNEInput -> [[Probability]] -> TSNEState -> TSNEState
 stepTSNE opts vs ps st = TSNEState i' s'' g' d'

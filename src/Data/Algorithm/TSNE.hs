@@ -4,8 +4,7 @@ module Data.Algorithm.TSNE (
         TSNEOutput3D(..)
     ) where
 
-import Control.Monad.Writer.Lazy (execWriter)
-import Control.Monad.State.Lazy (evalStateT)
+import Pipes
 
 import Data.Algorithm.TSNE.Types
 import Data.Algorithm.TSNE.Internals
@@ -14,10 +13,11 @@ import Data.Algorithm.TSNE.Utils
 {- |
 
 -}
-tsne3D :: TSNEOptions -> TSNEInput -> IO [TSNEOutput3D]
+tsne3D :: TSNEOptions -> TSNEInput -> Producer TSNEOutput3D IO ()
 tsne3D opts vs = do
-    st <- initState $ length vs
+    st <- liftIO $ initState $ length vs
     let ps = neighbourProbabilities opts vs
-    return $ [output3D ps st] ++ (execWriter $ evalStateT (runTSNE opts vs ps) st)
+    runTSNE opts vs ps st
+
 
 

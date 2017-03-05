@@ -1,5 +1,9 @@
+{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
+
 module Data.Algorithm.TSNE.Types where
 
+import GHC.Generics (Generic)
+import Control.DeepSeq
 import Data.Default
 
 
@@ -33,4 +37,4 @@ data TSNEState = TSNEState {
     stSolution :: [[Double]],
     stGains :: [[Gain]],
     stDeltas :: [[Delta]]
-} deriving (Show)
+} deriving (Show, Generic, NFData)

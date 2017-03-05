@@ -4,6 +4,7 @@ import System.Environment(getArgs)
 import System.Exit
 import Control.Monad(when)
 import Data.Default(def)
+import Pipes
 import Data.Algorithm.TSNE
 
 
@@ -27,17 +28,16 @@ main = do
 
     putStrLn $ "using: " ++ show n'
 
-    solutions <- tsne3D def $ take n' inputData
-    outputSolutions solutions
+    runEffect $ for (tsne3D def $ take n' inputData) $ \r -> do
+        lift $ outputResult r
 
 readDataFile :: FilePath -> IO [[Double]]
 readDataFile f = do
     d <- readFile f
     return $ map read (lines d)
 
-outputSolutions :: [TSNEOutput3D] -> IO()
-outputSolutions (s:ss) = do
+outputResult :: TSNEOutput3D -> IO ()
+outputResult s = do
     putStrLn $ "iteration: " ++ (show.tsneIteration) s
     putStrLn $ "cost: " ++ (show.tsneCost) s
-    outputSolutions ss
 
