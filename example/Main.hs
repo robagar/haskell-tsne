@@ -28,8 +28,10 @@ main = do
 
     putStrLn $ "using: " ++ show n'
 
-    runEffect $ for (tsne3D def $ take n' inputData) $ \r -> do
-        lift $ outputResult r
+    forTsne3D outputResult def $ take n' inputData
+    
+    --runEffect $ for (tsne3D def $ take n' inputData) $ \r -> do
+    --    lift $ outputResult r
 
 readDataFile :: FilePath -> IO [[Double]]
 readDataFile f = do
