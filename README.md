@@ -1,5 +1,7 @@
 # Haskell-tSNE #
 
+Available on Hackage: [tsne](https://hackage.haskell.org/package/tsne)
+
 A pure Haskell implementation of the [t-SNE](https://lvdmaaten.github.io/tsne/) data dimension reduction algorithm.
 
 * The `tsne3D` function takes a list of high dimension values and generates a sequence of solutions. Each solution is a list of 3D points, one for each input value.
