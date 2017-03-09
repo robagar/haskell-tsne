@@ -6,6 +6,8 @@ A pure Haskell implementation of the [t-SNE](https://lvdmaaten.github.io/tsne/) 
 * Rather slow. It's not at all optimized yet. Internally it uses lists of plain vanilla Haskell boxed `Double`s, which probably accounts for a a fair chunk of the slowness.
 * Based on the [tSNEJS](https://github.com/karpathy/tsnejs) JavaScript implementation (thanks!)
 
+See it in action on [YouTube](https://youtu.be/R74ADQgArZg) in my 3D t-SNE visualization application [TeaSneeze](https://bitbucket.org/robagar/teasneeze).
+
 ### Example ###
 
 Using the Python scikit-learn [digits](http://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_digits.html#sklearn.datasets.load_digits) data set.
