@@ -40,6 +40,6 @@ readDataFile f = do
 
 outputResult :: TSNEOutput3D -> IO ()
 outputResult s = do
-    putStrLn $ "iteration: " ++ (show.tsneIteration) s
-    putStrLn $ "cost: " ++ (show.tsneCost) s
+    putStrLn $ "iteration: " ++ (show.tsneIteration3D) s
+    putStrLn $ "cost: " ++ (show.tsneCost3D) s
 

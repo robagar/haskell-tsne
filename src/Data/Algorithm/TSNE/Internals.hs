@@ -35,9 +35,16 @@ isValidStateForInput i st
             n = inputSize i
             s = stSolution st    
 
-initState :: Int -> IO TSNEState
-initState n = do
+initState3D :: Int -> IO TSNEState
+initState3D n = do
     s <- initSolution3D n
+    return $ TSNEState 0 s (rr 1) (rr 0)
+        where
+            rr = repeat.repeat
+
+initState2D :: Int -> IO TSNEState
+initState2D n = do
+    s <- initSolution2D n
     return $ TSNEState 0 s (rr 1) (rr 0)
         where
             rr = repeat.repeat
@@ -50,11 +57,24 @@ initSolution3D n = do
     zs <- ns
     return $ take n <$> [xs,ys,zs]
 
-runTSNE :: TSNEOptions -> TSNEInput -> [[Probability]] -> TSNEState -> Producer TSNEOutput3D IO ()
-runTSNE opts vs ps st = do
+initSolution2D :: Int -> IO [[Double]]
+initSolution2D n = do
+    let ns = normalsIO' (0, 1e-4)
+    xs <- ns
+    ys <- ns
+    return $ take n <$> [xs,ys]
+
+runTSNE3D :: TSNEOptions -> TSNEInput -> [[Probability]] -> TSNEState -> Producer TSNEOutput3D IO ()
+runTSNE3D opts vs ps st = do
+    yield $ output3D ps st
     let st' = force $ stepTSNE opts vs ps st
-    yield $ output3D ps st'
-    runTSNE opts vs ps st'
+    runTSNE3D opts vs ps st'
+
+runTSNE2D :: TSNEOptions -> TSNEInput -> [[Probability]] -> TSNEState -> Producer TSNEOutput2D IO ()
+runTSNE2D opts vs ps st = do
+    yield $ output2D ps st
+    let st' = force $ stepTSNE opts vs ps st
+    runTSNE2D opts vs ps st'
 
 stepTSNE :: TSNEOptions -> TSNEInput -> [[Probability]] -> TSNEState -> TSNEState
 stepTSNE opts vs ps st = TSNEState i' s'' g' d'
@@ -109,6 +129,16 @@ output3D pss st = TSNEOutput3D i s c
     where
         i = stIteration st
         s = (solution3D . stSolution) st
+        c = cost pss st
+
+solution2D :: [[Double]] -> [Position2D]
+solution2D (xs:ys:_) = zip xs ys
+
+output2D :: [[Double]] -> TSNEState -> TSNEOutput2D
+output2D pss st = TSNEOutput2D i s c
+    where
+        i = stIteration st
+        s = (solution2D . stSolution) st
         c = cost pss st
 
 cost :: [[Double]] -> TSNEState -> Double

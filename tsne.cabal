@@ -1,5 +1,5 @@
 name:                tsne
-version:             1.0.0.1
+version:             1.1.0
 synopsis:            t-SNE
 description:         Pure Haskell implementation of the t-SNE dimension reduction algorithm.
 homepage:            https://bitbucket.org/robagar/haskell-tsne

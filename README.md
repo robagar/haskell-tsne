@@ -4,7 +4,7 @@ Available on Hackage: [tsne](https://hackage.haskell.org/package/tsne)
 
 A pure Haskell implementation of the [t-SNE](https://lvdmaaten.github.io/tsne/) data dimension reduction algorithm.
 
-* The `tsne3D` function takes a list of high dimension values and generates a sequence of solutions. Each solution is a list of 3D points, one for each input value.
+* The `tsne2D` and `tsne3D` functions take a list of high dimension values and generates a sequence of solutions. Each solution is a list of 2D/3D positions, one for each input value.
 * Rather slow. It's not at all optimized yet. Internally it uses lists of plain vanilla Haskell boxed `Double`s, which probably accounts for a a fair chunk of the slowness.
 * Based on the [tSNEJS](https://github.com/karpathy/tsnejs) JavaScript implementation (thanks!)
 
@@ -26,8 +26,8 @@ main = do
 
 printTsneResult :: TSNEOutput3D -> IO ()
 printTsneResult r = do
-    putStrLn $ "iteration: " ++ (show.tsneIteration) r
-    putStrLn $ "cost: " ++ (show.tsneCost) r
+    putStrLn $ "iteration: " ++ (show.tsneIteration3D) r
+    putStrLn $ "cost: " ++ (show.tsneCost3D) r
 
 -- first 20 values of the digits dataset
 exampleInput :: [[Double]]

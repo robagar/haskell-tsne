@@ -18,9 +18,17 @@ type TSNEInput =  [TSNEInputValue]
 type Position3D = (Double,Double,Double)
 
 data TSNEOutput3D = TSNEOutput3D {
-    tsneIteration :: Int,
+    tsneIteration3D :: Int,
     tsneSolution3D :: [Position3D],
-    tsneCost :: Double
+    tsneCost3D :: Double
+} deriving (Show, Eq)
+
+type Position2D = (Double,Double)
+
+data TSNEOutput2D = TSNEOutput2D {
+    tsneIteration2D :: Int,
+    tsneSolution2D :: [Position2D],
+    tsneCost2D :: Double
 } deriving (Show, Eq)
 
 instance Default TSNEOptions where
