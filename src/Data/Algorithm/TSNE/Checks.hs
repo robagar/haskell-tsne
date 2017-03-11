@@ -17,3 +17,23 @@ shape2D xss = (length (head xss), length xss)
 isRectangular :: [[a]] -> Bool
 isRectangular xss = has2DShape (shape2D xss) xss
 
+inputSize :: TSNEInput -> Int
+inputSize = length
+
+inputValueSize :: TSNEInput -> Int
+inputValueSize i = w 
+    where (w,h) = shape2D i 
+
+inputIsValid :: TSNEInput -> Either String ()
+inputIsValid [] = Left "empty input data"
+inputIsValid xss
+    | not (isRectangular xss) = Left "input data values are not all the same length"
+    | otherwise = Right () 
+
+isValidStateForInput :: TSNEInput -> TSNEState -> Either String ()
+isValidStateForInput i st
+    | not (has2DShape (n,3) s) = Left $ "solution is wrong shape: " ++ show (shape2D s) 
+    | otherwise = Right ()
+        where
+            n = inputSize i
+            s = stSolution st  

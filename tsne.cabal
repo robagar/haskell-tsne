@@ -16,9 +16,12 @@ library
   hs-source-dirs:      src
   exposed-modules:     Data.Algorithm.TSNE,
                        Data.Algorithm.TSNE.Types, 
-                       Data.Algorithm.TSNE.Internals, 
                        Data.Algorithm.TSNE.Utils,
-                       Data.Algorithm.TSNE.Checks 
+                       Data.Algorithm.TSNE.Checks, 
+                       Data.Algorithm.TSNE.Preparation, 
+                       Data.Algorithm.TSNE.Stepping, 
+                       Data.Algorithm.TSNE.Run2D, 
+                       Data.Algorithm.TSNE.Run3D 
   build-depends:       base >= 4.7 && < 5,
                        data-default,
                        deepseq,
@@ -31,7 +34,7 @@ test-suite tSNE-test
   hs-source-dirs:      test
   main-is:             Spec.hs
   other-modules:       Data.Algorithm.TSNESpec,
-                       Data.Algorithm.TSNE.InternalsSpec,
+--                       Data.Algorithm.TSNE.InternalsSpec,
                        Data.Algorithm.TSNE.UtilsSpec,
                        Data.Algorithm.TSNE.ChecksSpec
   build-depends:       base,

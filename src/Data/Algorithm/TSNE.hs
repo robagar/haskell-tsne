@@ -11,8 +11,11 @@ module Data.Algorithm.TSNE (
 import Pipes
 
 import Data.Algorithm.TSNE.Types
-import Data.Algorithm.TSNE.Internals
 import Data.Algorithm.TSNE.Utils
+import Data.Algorithm.TSNE.Preparation
+import Data.Algorithm.TSNE.Run3D
+import Data.Algorithm.TSNE.Run2D
+
 
 -- | Generates an infinite stream of 3D tSNE iterations.
 tsne3D :: TSNEOptions -> TSNEInput -> Producer TSNEOutput3D IO ()
