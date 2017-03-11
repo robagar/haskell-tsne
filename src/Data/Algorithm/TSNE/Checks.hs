@@ -30,10 +30,11 @@ inputIsValid xss
     | not (isRectangular xss) = Left "input data values are not all the same length"
     | otherwise = Right () 
 
-isValidStateForInput :: TSNEInput -> TSNEState -> Either String ()
-isValidStateForInput i st
-    | not (has2DShape (n,3) s) = Left $ "solution is wrong shape: " ++ show (shape2D s) 
+isValidStateForInput :: Int -> TSNEInput -> TSNEState -> Either String ()
+isValidStateForInput d i st
+    | not (has2DShape (n,d) s) = Left $ "solution is wrong shape: " ++ show (shape2D s) 
     | otherwise = Right ()
         where
             n = inputSize i
             s = stSolution st  
+

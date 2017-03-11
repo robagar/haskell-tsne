@@ -1,72 +1,9 @@
-module Data.Algorithm.TSNE.InternalsSpec (main, spec) where
+module Data.Algorithm.TSNE.TestInput where
 
 import Data.Default (def)
 
-import Test.Hspec
-import Data.Algorithm.TSNE.Internals
-import Data.Algorithm.TSNE.Checks
 import Data.Algorithm.TSNE.Types
-import Data.Algorithm.TSNE.Utils
-
--- `main` is here so that this module can be run from GHCi on its own.  It is
--- not needed for automatic spec discovery.
-main :: IO ()
-main = hspec spec
-
-u = undefined
-
-spec :: Spec
-spec = do
-    let n = inputSize testInput
-        w = inputValueSize testInput
-
-    describe "testInput" $ do
-        it "is right shape" $ do
-            testInput `shouldSatisfy` has2DShape (64, 20)
-        it "is valid" $ do
-            inputIsValid testInput `shouldBe` Right ()
-        it "has right size" $ do
-            inputSize testInput `shouldBe` 20
-        it "has right value size" $ do
-            inputValueSize testInput `shouldBe` 64
-
-    describe "initSolution3D" $ do
-        it "is right shape" $
-            --initSolution3D 99 >>= (`shouldSatisfy` (\s -> length s == 3 && all (\xs -> length xs == 99) s))
-            initSolution3D n >>= (`shouldSatisfy` has2DShape (n,3))
-
-    describe "initState" $ do
-        it "is valid state" $
-            initState n >>= (`shouldSatisfy` isRight . (isValidStateForInput testInput))
-
-    describe "neighbourProbabilities" $ do
-        it "is right shape" $ do
-            testNeighbourProbs `shouldSatisfy` has2DShape (n,n)
-
-    describe "qdist" $ do
-        it "is right shape" $ do
-            s <- initSolution3D n
-            qdist s `shouldSatisfy` has2DShape (n,n)        
-
-    describe "qdist'" $ do
-        it "is right shape" $ do
-            s <- initSolution3D n
-            qdist' s `shouldSatisfy` has2DShape (n,n)        
-
-    describe "gradients" $ do
-        it "is right shape" $ do
-            s <- initState n
-            gradients testNeighbourProbs s `shouldSatisfy` has2DShape (n,3)
-
-    describe "stepTSNE" $ do
-        it "works" $ do 
-            s <- initState n
-            stepTSNE def testInput testNeighbourProbs s `shouldSatisfy` isRight . (isValidStateForInput testInput)
-
-
-isRight :: Either a b -> Bool
-isRight (Left _) = False
-isRight (Right _) = True
+import Data.Algorithm.TSNE.Preparation
 
 -- first 20 digits from the Python sklearn digits dataset
 testInput :: TSNEInput
@@ -95,3 +32,4 @@ testInput = [
 
 testNeighbourProbs :: [[Probability]]
 testNeighbourProbs = neighbourProbabilities def testInput
+
