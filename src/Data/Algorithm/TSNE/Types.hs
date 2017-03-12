@@ -1,10 +1,7 @@
-{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
-
 module Data.Algorithm.TSNE.Types where
 
-import GHC.Generics (Generic)
-import Control.DeepSeq
 import Data.Default
+import qualified Data.Array.Repa as R
 
 
 data TSNEOptions = TSNEOptions {
@@ -42,7 +39,7 @@ type Entropy = Double
 
 data TSNEState = TSNEState {
     stIteration :: Int,
-    stSolution :: [[Double]],
-    stGains :: [[Gain]],
-    stDeltas :: [[Delta]]
-} deriving (Show, Generic, NFData)
+    stSolution :: R.Array R.U R.DIM2 Double, -- 2D array of unboxed doubles
+    stGains :: R.Array R.U R.DIM2 Double,
+    stDeltas :: R.Array R.U R.DIM2 Double
+} deriving (Show)

@@ -31,10 +31,11 @@ inputIsValid xss
     | otherwise = Right () 
 
 isValidStateForInput :: Int -> TSNEInput -> TSNEState -> Either String ()
-isValidStateForInput d i st
-    | not (has2DShape (n,d) s) = Left $ "solution is wrong shape: " ++ show (shape2D s) 
-    | otherwise = Right ()
-        where
-            n = inputSize i
-            s = stSolution st  
+isValidStateForInput d i st = undefined
+--isValidStateForInput d i st
+--    | not (has2DShape (n,d) s) = Left $ "solution is wrong shape: " ++ show (shape2D s) 
+--    | otherwise = Right ()
+--        where
+--            n = inputSize i
+--            s = stSolution st  
 
