@@ -27,8 +27,8 @@ initSolution3D n = undefined
 --    zs <- ns
 --    return $ take n <$> [xs,ys,zs]
 
-runTSNE3D :: TSNEOptions -> TSNEInput -> [[Probability]] -> TSNEState -> Producer TSNEOutput3D IO ()
-runTSNE3D opts vs ps st = undefined
+runTSNE3D :: TSNEOptions -> ProbabilityArray -> TSNEState -> Producer TSNEOutput3D IO ()
+runTSNE3D opts ps st = undefined
 --runTSNE3D opts vs ps st = do
 --    yield $ output3D ps st
 --    let st' = force $ stepTSNE opts vs ps st

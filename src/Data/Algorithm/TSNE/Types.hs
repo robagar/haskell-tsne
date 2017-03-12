@@ -1,7 +1,9 @@
 module Data.Algorithm.TSNE.Types where
 
 import Data.Default
-import qualified Data.Array.Repa as R
+import Data.Array.Repa
+import Data.Vector as V
+import Data.Vector.Unboxed as U
 
 
 data TSNEOptions = TSNEOptions {
@@ -9,8 +11,11 @@ data TSNEOptions = TSNEOptions {
     tsneLearningRate :: Double
 }
 
-type TSNEInputValue =  [Double]
-type TSNEInput =  [TSNEInputValue]
+type TSNEInputValue = [Double]
+type TSNEInputValueU = U.Vector Double
+
+type TSNEInput = [TSNEInputValue]
+type TSNEInputVU = V.Vector TSNEInputValueU
 
 type Position3D = (Double,Double,Double)
 
@@ -32,6 +37,8 @@ instance Default TSNEOptions where
     def = TSNEOptions 30 10
 
 type Probability = Double
+type ProbabilityArray = Array U DIM2 Double
+
 type Gain = Double
 type Delta = Double
 type Gradient = Double
@@ -39,7 +46,7 @@ type Entropy = Double
 
 data TSNEState = TSNEState {
     stIteration :: Int,
-    stSolution :: R.Array R.U R.DIM2 Double, -- 2D array of unboxed doubles
-    stGains :: R.Array R.U R.DIM2 Double,
-    stDeltas :: R.Array R.U R.DIM2 Double
+    stSolution :: Array U DIM2 Double, -- 2D array of unboxed doubles
+    stGains :: Array U DIM2 Double,
+    stDeltas :: Array U DIM2 Double
 } deriving (Show)

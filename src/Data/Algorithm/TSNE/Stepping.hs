@@ -8,8 +8,8 @@ import Data.Algorithm.TSNE.Types
 import Data.Algorithm.TSNE.Utils
 
 
-stepTSNE :: TSNEOptions -> TSNEInput -> [[Probability]] -> TSNEState -> TSNEState
-stepTSNE opts vs ps st = undefined
+stepTSNE :: TSNEOptions -> ProbabilityArray -> TSNEState -> TSNEState
+stepTSNE opts ps st = undefined
 --stepTSNE opts vs ps st = TSNEState i' s'' g' d'
 --    where
 --        i = stIteration st

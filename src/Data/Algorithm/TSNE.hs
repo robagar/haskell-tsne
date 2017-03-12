@@ -9,6 +9,7 @@ module Data.Algorithm.TSNE (
     ) where
 
 import Pipes
+import qualified Data.Array.Repa as R
 
 import Data.Algorithm.TSNE.Types
 import Data.Algorithm.TSNE.Utils
@@ -21,7 +22,7 @@ import Data.Algorithm.TSNE.Run2D
 tsne3D :: TSNEOptions -> TSNEInput -> Producer TSNEOutput3D IO ()
 tsne3D opts input = do
     st <- liftIO $ initState3D $ length input
-    runTSNE3D opts input ps st
+    runTSNE3D opts ps st
         where ps = neighbourProbabilities opts input
 
 -- | Executes an IO action for each iteration of the 3D tSNE algorithm.
@@ -32,10 +33,11 @@ forTsne3D action opts input = do
 
 -- | Generates an infinite stream of 2D tSNE iterations.
 tsne2D :: TSNEOptions -> TSNEInput -> Producer TSNEOutput2D IO ()
-tsne2D opts input = do
-    st <- liftIO $ initState2D $ length input
-    runTSNE2D opts input ps st
-        where ps = neighbourProbabilities opts input
+tsne2D opts input = undefined
+--tsne2D opts input = do
+--    st <- liftIO $ initState2D $ length input
+--    runTSNE2D opts input ps st
+--        where ps = neighbourProbabilities opts input
 
 -- | Executes an IO action for each iteration of the 2D tSNE algorithm.
 forTsne2D :: (TSNEOutput2D -> IO ()) -> TSNEOptions -> TSNEInput -> IO ()
