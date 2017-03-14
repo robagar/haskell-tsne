@@ -26,7 +26,6 @@ library
                        data-default,
                        deepseq,
                        normaldistribution,
-                       repa,
                        vector,
                        pipes
   default-language:    Haskell2010

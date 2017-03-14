@@ -9,7 +9,6 @@ module Data.Algorithm.TSNE (
     ) where
 
 import Pipes
-import qualified Data.Array.Repa as R
 
 import Data.Algorithm.TSNE.Types
 import Data.Algorithm.TSNE.Utils

@@ -1,6 +1,5 @@
 module Data.Algorithm.TSNE.Preparation where
 
-import Data.Array.Repa as R
 import Data.Vector as V
 import Data.Vector.Unboxed as U
 
@@ -24,7 +23,7 @@ neighbourProbabilities opts vs = undefined
 --neighbourProbabilities opts vs = symmetrize $ rawNeighbourProbabilities opts vs
 
 rawNeighbourProbabilities :: TSNEOptions -> Int -> TSNEInputVU -> ProbabilityArray
-rawNeighbourProbabilities opts n vs = R.fromUnboxed (ix2 n n) $ _ $ V.map np vs
+rawNeighbourProbabilities opts n vs = V.map np vs
     where 
         np a = aps (beta a) vs a
         beta a = betaValue $ binarySearchBeta opts vs a
