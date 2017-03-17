@@ -19,11 +19,10 @@ data Beta = Beta {
 }
 
 neighbourProbabilities :: TSNEOptions -> TSNEInput -> ProbabilityArray
-neighbourProbabilities opts vs = undefined
---neighbourProbabilities opts vs = symmetrize $ rawNeighbourProbabilities opts vs
+neighbourProbabilities opts vs = symmetrize $ rawNeighbourProbabilities opts (fromListVU vs)
 
-rawNeighbourProbabilities :: TSNEOptions -> Int -> TSNEInputVU -> ProbabilityArray
-rawNeighbourProbabilities opts n vs = V.map np vs
+rawNeighbourProbabilities :: TSNEOptions -> TSNEInputVU -> ProbabilityArray
+rawNeighbourProbabilities opts vs = V.map np vs
     where 
         np a = aps (beta a) vs a
         beta a = betaValue $ binarySearchBeta opts vs a

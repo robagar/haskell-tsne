@@ -1,8 +1,12 @@
+{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
+
 module Data.Algorithm.TSNE.Types where
 
+import GHC.Generics (Generic)
+import Control.DeepSeq
 import Data.Default
-import Data.Vector as V
-import Data.Vector.Unboxed as U
+import qualified Data.Vector as V
+import qualified Data.Vector.Unboxed as U
 
 
 data TSNEOptions = TSNEOptions {
@@ -35,17 +39,20 @@ data TSNEOutput2D = TSNEOutput2D {
 instance Default TSNEOptions where
     def = TSNEOptions 30 10
 
+type Array2D = V.Vector (U.Vector Double) -- 2D array of unboxed doubles
+
 type Probability = Double
-type ProbabilityArray = V.Vector (U.Vector Double)
+type ProbabilityArray = Array2D
 
 type Gain = Double
 type Delta = Double
 type Gradient = Double
+type GradientArray = Array2D
 type Entropy = Double
 
 data TSNEState = TSNEState {
     stIteration :: Int,
-    stSolution :: V.Vector (U.Vector Double), -- 2D array of unboxed doubles
-    stGains :: V.Vector (U.Vector Double),
-    stDeltas :: V.Vector (U.Vector Double)
-} deriving (Show)
+    stSolution :: Array2D,
+    stGains :: Array2D,
+    stDeltas :: Array2D
+} deriving (Show, Generic, NFData)
