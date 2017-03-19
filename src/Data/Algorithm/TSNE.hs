@@ -21,6 +21,7 @@ import Data.Algorithm.TSNE.Run2D
 tsne3D :: TSNEOptions -> TSNEInput -> Producer TSNEOutput3D IO ()
 tsne3D opts input = do
     st <- liftIO $ initState3D $ length input
+    liftIO $ putStrLn $ "st: " ++ show st
     runTSNE3D opts ps st
         where ps = neighbourProbabilities opts input
 

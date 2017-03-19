@@ -1,3 +1,5 @@
+{-# LANGUAGE BangPatterns #-}
+
 module Data.Algorithm.TSNE.Run3D where
 
 import Control.Applicative
@@ -25,10 +27,10 @@ initSolution3D n = do
     xs <- ns
     ys <- ns
     zs <- ns
-    return $ V.fromList $ U.fromList . take n <$> [xs,ys,zs]
+    return $ V.fromList $ U.fromList <$> take n <$> [xs,ys,zs]
 
 runTSNE3D :: TSNEOptions -> ProbabilityArray -> TSNEState -> Producer TSNEOutput3D IO ()
-runTSNE3D opts ps st = do
+runTSNE3D opts !ps st = do
     yield $ output3D ps st
     let st' = force $ stepTSNE opts ps st
     runTSNE3D opts ps st'

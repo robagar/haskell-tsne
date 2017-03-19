@@ -1,9 +1,11 @@
 module Data.Algorithm.TSNE.Utils where
 
-import Data.Vector as V
-import Data.Vector.Unboxed as U
+import qualified Data.Vector as V
+import qualified Data.Vector.Unboxed as U
 import Data.List(foldr, transpose)
 import Data.Algorithm.TSNE.Types
+
+import Debug.Trace
 
 infinity :: Double
 infinity = read "Infinity"
@@ -13,7 +15,7 @@ distanceSquared as bs = U.foldr d 0 (U.zip as bs)
     where d (a,b) t  = t + (a-b) * (a-b)
 
 symmetrize :: Array2D -> Array2D
-symmetrize m = (V.zipWith . U.zipWith) f m (transposeVU m)
+symmetrize m = trace "symmetrize" $ (V.zipWith . U.zipWith) f m (transposeVU m)
     where 
         f :: Double -> Double -> Double
         f x y = max a 1e-100
@@ -33,7 +35,7 @@ qdist ss = symmetricalMatrixFromTopRight $ qd (transposeVU ss)
             | otherwise = V.singleton(qr ps) V.++ qd (V.tail ps)
                             where
                                 qr :: Array2D -> U.Vector Double
-                                qr ps = U.singleton 0 U.++ convert (q (V.head ps) <$> V.tail ps)
+                                qr ps = U.singleton 0 U.++ U.convert (q (V.head ps) <$> V.tail ps)
                                 q as bs = 1 / (1 + s)
                                     where
                                         s = U.sum $ U.zipWith f as bs
@@ -55,16 +57,18 @@ reprep n a = V.replicate n (U.replicate n a)
 symmetricalMatrixFromTopRight :: Array2D -> Array2D
 symmetricalMatrixFromTopRight tr = V.zipWith (U.++) bl tr
     where
-        bl = V.zipWith U.take (V.fromList [0..]) (transposeVU m)
+        bl = V.zipWith U.take (V.fromList [0..n]) (transposeVU m)
         m = V.zipWith (U.++) ebl tr
-        ebl = V.zipWith U.take (V.fromList [0..]) (reprep n undefined)
+        ebl = V.zipWith U.take (V.fromList [0..n]) (reprep n 0)
         n = V.length tr
 
 transposeVU :: Array2D -> Array2D
-transposeVU m = convert (V.map U.head m) `V.cons` transposeVU (V.map U.tail m) 
+transposeVU m = if ((U.null . V.head) m) 
+                    then V.empty
+                    else V.convert (V.map U.head m) `V.cons` transposeVU (V.map U.tail m) 
 
 zipWithVU :: (Double -> Double -> Double) -> Array2D -> Array2D -> Array2D
 zipWithVU = V.zipWith . U.zipWith
 
 fromListVU :: [[Double]] -> Array2D
-fromListVU = V.fromList . Prelude.map U.fromList
+fromListVU m = trace ("fromListVU: " ++ show m) $ V.fromList $ map U.fromList m
