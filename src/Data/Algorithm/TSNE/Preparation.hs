@@ -7,7 +7,7 @@ import qualified Data.Vector.Unboxed as U
 import Data.Algorithm.TSNE.Types
 import Data.Algorithm.TSNE.Utils
 
-import Debug.Trace
+--import Debug.Trace
 
 
 targetEntropy :: TSNEOptions -> Entropy
@@ -24,14 +24,14 @@ neighbourProbabilities :: TSNEOptions -> TSNEInput -> ProbabilityArray
 neighbourProbabilities opts vs = symmetrize $ rawNeighbourProbabilities opts (fromListVU vs)
 
 rawNeighbourProbabilities :: TSNEOptions -> Array2D -> ProbabilityArray
-rawNeighbourProbabilities opts vs = trace ("rawNeighbourProbabilities: " ++ show vs) $ V.map np vs
+rawNeighbourProbabilities opts vs = V.map np vs
     where
         np :: U.Vector Double -> U.Vector Double 
-        np a = trace ("np: " ++ show a) $ aps (beta a) vs a
+        np a = aps (beta a) vs a
         beta a = betaValue $ binarySearchBeta opts vs a
 
         aps :: Double -> TSNEInputVU -> TSNEInputValueU -> U.Vector Probability
-        aps beta bs a = trace "aps" $ U.convert $ V.map pj' bs
+        aps beta bs a = U.convert $ V.map pj' bs
             where
                 psum = V.sum $ V.map pj bs
                 pj b 
@@ -40,7 +40,7 @@ rawNeighbourProbabilities opts vs = trace ("rawNeighbourProbabilities: " ++ show
                 pj' b = pj b / psum
 
 binarySearchBeta :: TSNEOptions -> TSNEInputVU -> TSNEInputValueU -> Beta
-binarySearchBeta opts vs = trace "binarySearchBeta" $ binarySearchBeta' opts vs 1e-4 0 (Beta 1 (-infinity) infinity)
+binarySearchBeta opts vs = binarySearchBeta' opts vs 1e-4 0 (Beta 1 (-infinity) infinity)
 
 type Tolerance = Double
 

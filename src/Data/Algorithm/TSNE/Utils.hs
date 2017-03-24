@@ -5,7 +5,7 @@ import qualified Data.Vector.Unboxed as U
 import Data.List(foldr, transpose)
 import Data.Algorithm.TSNE.Types
 
-import Debug.Trace
+--import Debug.Trace
 
 infinity :: Double
 infinity = read "Infinity"
@@ -15,7 +15,7 @@ distanceSquared as bs = U.foldr d 0 (U.zip as bs)
     where d (a,b) t  = t + (a-b) * (a-b)
 
 symmetrize :: Array2D -> Array2D
-symmetrize m = trace "symmetrize" $ (V.zipWith . U.zipWith) f m (transposeVU m)
+symmetrize m = (V.zipWith . U.zipWith) f m (transposeVU m)
     where 
         f :: Double -> Double -> Double
         f x y = max a 1e-100
@@ -71,4 +71,4 @@ zipWithVU :: (Double -> Double -> Double) -> Array2D -> Array2D -> Array2D
 zipWithVU = V.zipWith . U.zipWith
 
 fromListVU :: [[Double]] -> Array2D
-fromListVU m = trace ("fromListVU: " ++ show m) $ V.fromList $ map U.fromList m
+fromListVU m = V.fromList $ map U.fromList m
